@@ -1,24 +1,18 @@
 import axios from "axios";
 
 export interface Contact {
-  id: number;
+  id: string | number;
   name: string;
   email: string;
   phone: string;
-  createdAt: string;
-}
-
-interface ApiResponse {
-  statusCode: number;
-  message: string;
-  data: Contact[];
+  createdAt?: string;
 }
 
 const API_URL = "http://localhost:4000";
 
 export const getContacts = async (): Promise<Contact[]> => {
   try {
-    const response = await axios.get<ApiResponse>(`${API_URL}/contacts`);
+    const response = await axios.get(`${API_URL}/contacts`);
     return response.data.data;
   } catch (error) {
     console.error("Error fetching contacts:", error);
@@ -26,12 +20,49 @@ export const getContacts = async (): Promise<Contact[]> => {
   }
 };
 
-export const deleteContact = async (id: number): Promise<boolean> => {
+export const getContact = async (
+  id: string | number
+): Promise<Contact | null> => {
+  try {
+    const response = await axios.get(`${API_URL}/contacts/${id}`);
+    return response.data.data;
+  } catch (error) {
+    console.error(`Error fetching contact ${id}:`, error);
+    return null;
+  }
+};
+
+export const addContact = async (
+  contact: Omit<Contact, "id">
+): Promise<Contact | null> => {
+  try {
+    const response = await axios.post(`${API_URL}/contacts`, contact);
+    return response.data.data;
+  } catch (error) {
+    console.error("Error adding contact:", error);
+    return null;
+  }
+};
+
+export const updateContact = async (
+  id: string | number,
+  contact: Omit<Contact, "id">
+): Promise<Contact | null> => {
+  try {
+    const response = await axios.put(`${API_URL}/contacts/${id}`, contact);
+    return response.data.data;
+  } catch (error) {
+    console.error(`Error updating contact ${id}:`, error);
+    return null;
+  }
+};
+
+export const deleteContact = async (id: string | number): Promise<boolean> => {
   try {
     await axios.delete(`${API_URL}/contacts/${id}`);
     return true;
   } catch (error) {
-    console.error("Error deleting contact:", error);
+    console.error(`Error deleting contact ${id}:`, error);
     return false;
   }
 };

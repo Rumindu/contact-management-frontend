@@ -1,4 +1,5 @@
 import axios from "axios";
+import config from "../config/config";
 
 export interface Contact {
   id: string | number;
@@ -8,7 +9,7 @@ export interface Contact {
   createdAt?: string;
 }
 
-const API_URL = "http://localhost:4000";
+const API_URL = config.API_URL;
 
 export const getContacts = async (search?: string): Promise<Contact[]> => {
   try {

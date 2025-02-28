@@ -16,6 +16,7 @@ const ContactList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const navigate = useNavigate();
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const [isSearching, setIsSearching] = useState<boolean>(false);
 
   useEffect(() => {
     fetchContacts();
@@ -24,10 +25,12 @@ const ContactList: React.FC = () => {
   const fetchContacts = async (search?: string) => {
     try {
       setLoading(true);
+      setIsSearching(!!search);
       const data = await getContacts(search);
       setContacts(data);
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to fetch contacts");
+      setContacts([]);
     } finally {
       setLoading(false);
       if (searchInputRef.current) {
@@ -37,11 +40,20 @@ const ContactList: React.FC = () => {
   };
 
   const handleSearch = () => {
-    fetchContacts(searchTerm);
+    if (searchTerm.trim()) {
+      fetchContacts(searchTerm);
+    } else {
+      fetchContacts();
+      setIsSearching(false);
+    }
   };
 
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
+    if (!value.trim()) {
+      fetchContacts();
+      setIsSearching(false);
+    }
   };
 
   const handleDelete = async (id: string | number) => {
@@ -65,16 +77,14 @@ const ContactList: React.FC = () => {
 
   return (
     <div className="container mx-auto p-4">
-      {/* Centered title at the top */}
       <h1 className="text-3xl font-bold mb-6 text-center">
         Contact Management
       </h1>
 
-      {/* Action bar with Add button on left and search on right */}
       <div className="flex justify-between items-center mb-6">
         <button
           onClick={() => navigate("/add")}
-          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         >
           Add Contact
         </button>
@@ -100,6 +110,8 @@ const ContactList: React.FC = () => {
           contacts={contacts}
           onEdit={handleEdit}
           onDelete={handleDelete}
+          isSearching={isSearching}
+          searchTerm={searchTerm}
         />
       )}
     </div>

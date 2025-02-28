@@ -6,12 +6,16 @@ interface ContactTableProps {
   contacts: Contact[];
   onEdit: (contact: Contact) => void;
   onDelete: (id: string | number) => void;
+  isSearching: boolean;
+  searchTerm: string;
 }
 
 const ContactTable: React.FC<ContactTableProps> = ({
   contacts,
   onEdit,
   onDelete,
+  isSearching,
+  searchTerm,
 }) => {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
@@ -82,7 +86,7 @@ const ContactTable: React.FC<ContactTableProps> = ({
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
-          {sortedContacts.length > 0 ? (
+          {contacts.length > 0 ? (
             sortedContacts.map((contact) => (
               <ContactRow
                 key={contact.id}
@@ -93,8 +97,30 @@ const ContactTable: React.FC<ContactTableProps> = ({
             ))
           ) : (
             <tr>
-              <td colSpan={4} className="px-6 py-4 text-center text-gray-500">
-                No contacts found
+              <td
+                colSpan={4}
+                className="px-6 py-8 text-center text-gray-500 bg-gray-50"
+              >
+                <div className="flex flex-col items-center justify-center space-y-2">
+                  <svg
+                    className="w-8 h-8 text-gray-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <span className="text-sm font-medium">
+                    {isSearching
+                      ? `No contacts found for "${searchTerm}"`
+                      : "No contacts available"}
+                  </span>
+                </div>
               </td>
             </tr>
           )}

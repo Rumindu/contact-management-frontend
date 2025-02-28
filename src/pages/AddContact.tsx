@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import ContactForm from "../components/ContactForm";
 import { addContact } from "../services/contactService";
@@ -10,13 +11,22 @@ const AddContact: React.FC = () => {
 
   const handleSubmit = async (data: ContactFormValues) => {
     setIsSubmitting(true);
+    const toastId = toast.loading("Adding contact...");
     try {
       const result = await addContact(data);
+      console.log(result);
       if (result) {
+        toast.success("Contact added successfully", { id: toastId });
         navigate("/");
+      } else {
+        toast.error("Failed to add contact", { id: toastId });
       }
-    } catch (error) {
-      console.error("Failed to add contact:", error);
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.status === 409
+          ? "Email already in use"
+          : error.response?.data?.message || "Failed to add contact";
+      toast.error(errorMessage, { id: toastId });
     } finally {
       setIsSubmitting(false);
     }

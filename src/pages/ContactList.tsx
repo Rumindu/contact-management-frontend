@@ -5,6 +5,7 @@ import {
   deleteContact,
   Contact,
 } from "../services/contactService";
+import toast from "react-hot-toast";
 import ContactTable from "../components/ContactTable";
 import LoadingSpinner from "../components/LoadingSpinner";
 import SearchBox from "../components/SearchBox";
@@ -25,8 +26,8 @@ const ContactList: React.FC = () => {
       setLoading(true);
       const data = await getContacts(search);
       setContacts(data);
-    } catch (error) {
-      console.error("Error fetching contacts:", error);
+    } catch (error : any) {
+      toast.error(error.response?.data?.message || "Failed to fetch contacts");
     } finally {
       setLoading(false);
       if (searchInputRef.current) {
@@ -44,12 +45,15 @@ const ContactList: React.FC = () => {
   };
 
   const handleDelete = async (id: string | number) => {
+    const toastId = toast.loading("Deleting contact...");
     try {
       await deleteContact(id);
+      toast.success("Contact deleted successfully", { id: toastId });
       fetchContacts();
     } catch (error) {
-      console.error("Error deleting contact:", error);
+      toast.error(error.response?.data?.message || "Failed to delete contact");
     }
+    
   };
 
   const handleEdit = (contact: Contact) => {

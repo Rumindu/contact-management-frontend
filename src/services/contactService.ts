@@ -5,7 +5,7 @@ export interface Contact {
   id: string | number;
   name: string;
   email: string;
-  phone: string;
+  phone?: string;
   createdAt?: string;
 }
 
@@ -21,7 +21,7 @@ export const getContacts = async (search?: string): Promise<Contact[]> => {
     return response.data.data;
   } catch (error) {
     console.error("Error fetching contacts:", error);
-    return [];
+    throw error;
   }
 };
 
@@ -33,7 +33,7 @@ export const getContact = async (
     return response.data.data;
   } catch (error) {
     console.error(`Error fetching contact ${id}:`, error);
-    return null;
+    throw error;
   }
 };
 
@@ -45,7 +45,7 @@ export const addContact = async (
     return response.data.data;
   } catch (error) {
     console.error("Error adding contact:", error);
-    return null;
+    throw error;
   }
 };
 
@@ -58,7 +58,7 @@ export const updateContact = async (
     return response.data.data;
   } catch (error) {
     console.error(`Error updating contact ${id}:`, error);
-    return null;
+    throw error;
   }
 };
 
@@ -68,6 +68,6 @@ export const deleteContact = async (id: string | number): Promise<boolean> => {
     return true;
   } catch (error) {
     console.error(`Error deleting contact ${id}:`, error);
-    return false;
+    throw error;
   }
 };

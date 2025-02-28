@@ -4,6 +4,7 @@ import ContactForm from "../components/ContactForm";
 import { getContact, updateContact } from "../services/contactService";
 import { ContactFormValues } from "../schemas/contactSchema";
 import LoadingSpinner from "../components/LoadingSpinner";
+import toast from "react-hot-toast";
 
 const EditContact: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -17,7 +18,6 @@ const EditContact: React.FC = () => {
   useEffect(() => {
     const fetchContact = async () => {
       if (!id) return;
-
       try {
         setLoading(true);
         const contact = await getContact(id);
@@ -28,11 +28,12 @@ const EditContact: React.FC = () => {
             phone: contact.phone,
           });
         } else {
-          navigate("/");
+          toast.error("Contact not found");
+          setTimeout(() => navigate("/"), 2000);
         }
-      } catch (error) {
-        console.error("Failed to fetch contact:", error);
-        navigate("/");
+      } catch (error: any) {
+        toast.error(error.response?.data?.message || "Failed to load contact");
+        setTimeout(() => navigate("/"), 2000);
       } finally {
         setLoading(false);
       }
@@ -45,13 +46,21 @@ const EditContact: React.FC = () => {
     if (!id) return;
 
     setIsSubmitting(true);
+    const toastId = toast.loading("Updating contact...");
     try {
       const result = await updateContact(id, data);
       if (result) {
+        toast.success("Contact updated successfully", { id: toastId });
         navigate("/");
+      } else {
+        toast.error("Failed to update contact", { id: toastId });
       }
-    } catch (error) {
-      console.error("Failed to update contact:", error);
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.status === 409
+          ? "Email already in use"
+          : error.response?.data?.message || "Failed to update contact";
+      toast.error(errorMessage, { id: toastId });
     } finally {
       setIsSubmitting(false);
     }

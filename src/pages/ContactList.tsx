@@ -26,7 +26,7 @@ const ContactList: React.FC = () => {
       setLoading(true);
       const data = await getContacts(search);
       setContacts(data);
-    } catch (error : any) {
+    } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to fetch contacts");
     } finally {
       setLoading(false);
@@ -50,10 +50,9 @@ const ContactList: React.FC = () => {
       await deleteContact(id);
       toast.success("Contact deleted successfully", { id: toastId });
       fetchContacts();
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to delete contact");
     }
-    
   };
 
   const handleEdit = (contact: Contact) => {

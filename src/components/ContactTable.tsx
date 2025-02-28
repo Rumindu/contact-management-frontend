@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Contact } from "../services/contactService";
 import ContactRow from "./ContactRow";
 
@@ -13,13 +13,62 @@ const ContactTable: React.FC<ContactTableProps> = ({
   onEdit,
   onDelete,
 }) => {
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+
+  const handleSort = () => {
+    setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
+  };
+
+  const sortedContacts = [...contacts].sort((a, b) => {
+    const comparison = a.name.localeCompare(b.name);
+    return sortDirection === "asc" ? comparison : -comparison;
+  });
+
   return (
     <div className="overflow-x-auto shadow-md rounded-lg">
       <table className="min-w-full bg-white">
         <thead className="bg-gray-100">
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Name
+              <div
+                className="flex items-center gap-2 cursor-pointer hover:text-gray-700"
+                onClick={handleSort}
+              >
+                Name
+                <span className="inline-block">
+                  {sortDirection === "asc" ? (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 15l7-7 7 7"
+                      />
+                    </svg>
+                  ) : (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  )}
+                </span>
+              </div>
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Email
@@ -33,8 +82,8 @@ const ContactTable: React.FC<ContactTableProps> = ({
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
-          {contacts.length > 0 ? (
-            contacts.map((contact) => (
+          {sortedContacts.length > 0 ? (
+            sortedContacts.map((contact) => (
               <ContactRow
                 key={contact.id}
                 contact={contact}
